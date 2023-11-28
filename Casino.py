@@ -142,9 +142,9 @@ class Playthrough:
     def get_rules_str(self):
 
         rules = f"You and your opponent must bet the same amount between {self.emphasis}{self.casino.bet_lower_limit}{self.emphasis_end} to {self.emphasis}{self.casino.bet_upper_limit}{self.emphasis_end} coin(s) each round. You both simultaneously choose either {self.emphasis}\"High\"{self.emphasis_end} or {self.emphasis}\"Low\"{self.emphasis_end} as your betting option.\n"
-        rules += f"1. If both players choose {self.emphasis}\"Low,\"{self.emphasis_end} the host adds {self.emphasis}{self.casino.host_reward}{self.emphasis_end} coin(s) to the pot for each side.\n"
-        rules += f"2. If both players choose {self.emphasis}\"High,\"{self.emphasis_end} the host takes half of the coins from each side. {self.emphasis}For example, if you bet 3 coins, one coin is left.{self.emphasis_end}\n"
-        rules += f"3. If one player selects {self.emphasis}\"High\"{self.emphasis_end} while the other chooses {self.emphasis}\"Low,\"{self.emphasis_end} the {self.emphasis}\"High\"{self.emphasis_end} player wins all the coins in the pot.\n"
+        rules += f"1. {self.emphasis}Winner Takes All.{self.emphasis_end} If one player selects {self.emphasis}\"High\"{self.emphasis_end} while the other chooses {self.emphasis}\"Low,\"{self.emphasis_end} the {self.emphasis}\"High\"{self.emphasis_end} player wins all the coins in the pot.\n"
+        rules += f"2. {self.emphasis}Bragger's Punishment.{self.emphasis_end} If both players choose {self.emphasis}\"High,\"{self.emphasis_end} the host takes half of the coins from each side. {self.emphasis}For example, if you bet 3 coins, one coin is left.{self.emphasis_end}\n"
+        rules += f"3. {self.emphasis}Compromises Bring Rewards.{self.emphasis_end} If both players choose {self.emphasis}\"Low,\"{self.emphasis_end} the host adds {self.emphasis}{self.casino.host_reward}{self.emphasis_end} coin(s) to the pot for each side.\n"
         rules += f"4. Remember to take all your coins from the table before starting the next round.\n"
         
         return rules
