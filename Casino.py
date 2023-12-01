@@ -135,7 +135,7 @@ class Playthrough:
         intro += self.get_rules_str()
         intro += "\n"
         intro += self.get_money_str()
-        intro += "Welcome to the casino game!\n"
+        intro += f"Welcome to the casino game! You plan to play {self.emphasis}{len(self.opponents)}{self.emphasis_end} rounds.\n"
 
         return intro
 
