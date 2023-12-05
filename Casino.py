@@ -34,6 +34,9 @@ class Agent:
     def update_money(self, gain:int):
         self.money += gain
 
+    def get_max_time(self):
+        return 30
+
 class Player(Agent):
     def __init__(self, money, casino:Casino) -> None:
         super().__init__(money, casino=casino)
@@ -52,6 +55,9 @@ class BraggerAgent(Agent):
         desc = f"You overheard that this guy is a bragger. He always bets high.\n"
         return desc
 
+    def get_max_time(self):
+        return 30
+    
 class CowardAgent(Agent):
     def __init__(self, casino:Casino) -> None:
         super().__init__(10, casino=casino)
@@ -65,6 +71,9 @@ class CowardAgent(Agent):
     def get_description(self):
         desc = f"You overheard that this guy is a coward. He always bets low.\n"
         return desc
+    
+    def get_max_time(self):
+        return 30
     
 class RandomAgent(Agent):
     def __init__(self, casino:Casino) -> None:
@@ -80,6 +89,9 @@ class RandomAgent(Agent):
         desc = f"You overheard that this guy is mad. He randomly bets high or low.\n"
         return desc
 
+    def get_max_time(self):
+        return 90
+    
 class SmartAgent(Agent):
     def __init__(self, casino:Casino) -> None:
         super().__init__(10, casino=casino)
@@ -111,7 +123,9 @@ class SmartAgent(Agent):
     def get_description(self):
         desc = f"This guy appears to be smart. He bets high if he thinks the expected reward is higher than betting low. And he assumes you choose randomly.\n"
         return desc
-        
+    
+    def get_max_time(self):
+        return 120
 
 class Playthrough:
     def __init__(self, casino:Casino, player:Agent, opponents:list, with_html_emphasis:bool = False) -> None:
@@ -121,6 +135,7 @@ class Playthrough:
         self.reward_trace = [{} for _ in range(len(opponents))]
         self.emphasis = ""
         self.emphasis_end = ""
+        self.init_money = player.money
         if with_html_emphasis:
             self.emphasis = "<b>"
             self.emphasis_end = "</b>"
@@ -138,6 +153,24 @@ class Playthrough:
         intro += f"Welcome to the casino game! You plan to play {self.emphasis}{len(self.opponents)}{self.emphasis_end} rounds.\n"
 
         return intro
+
+    def get_conclusion_str(self):
+        conc = ""
+        gain = self.player.get_money() - self.init_money
+        if gain > 0:
+            conc += f"Lucky enough or clever enough, you earned {self.emphasis}{gain}{self.emphasis_end} coin(s) today.\n"
+            if gain > self.casino.bet_lower_limit * self.get_rounds():
+                conc += f"You played the game so well that you became a legend among other gamblers...\n"
+        elif gain < 0:
+            conc += f"Must be out of your bad luck, you lost {self.emphasis}{-gain}{self.emphasis_end} coin(s) today.\n"
+            if gain < -self.casino.bet_lower_limit * self.get_rounds():
+                conc += f"You almost lost all you have. But you are certain you can do better...\n"
+        else:
+            conc += f"Not a single coin was gained or lost. What's you point to come to the casino anyway? ...\n"
+        
+        return conc
+
+            
 
     def get_rules_str(self):
 
@@ -187,8 +220,9 @@ class Playthrough:
         money_left = self.get_money_str()
         oppo_desc = f"You see your opponent." + self.emphasis + self.opponents[round_num].get_description() + self.emphasis_end
         bet_desc = self.get_bet_str()
+        time_limit_desc = f"You have {self.emphasis}{self.get_round_time_limit(round_num)}{self.emphasis_end} seconds to make your decision.\n"
 
-        return desc + money_left + oppo_desc + "\n" +  bet_desc
+        return desc + money_left + oppo_desc + "\n" +  bet_desc + time_limit_desc
 
     def play_round(self, round_num:int, player_bet:int, player_choice:int):
         agent = self.opponents[round_num]
@@ -197,6 +231,9 @@ class Playthrough:
         p_r, a_r = self.casino.bet(player_bet, oppo_bet, player_choice, oppo_choice)
         self.player.update_money(p_r)
         self.reward_trace[round_num] = {"player_bet": player_bet, "opponent_bet": oppo_bet, "player_choice":player_choice, "opponent_choice":oppo_choice, "player_reward":p_r, "opponent_reward":a_r}
+
+    def get_round_time_limit(self, round_num:int):
+        return self.opponents[round_num].get_max_time()
 
     def get_round_result_str(self, round_num:int):
         return "RESULT: " + self.get_choice_str(round_num) + self.get_oppo_choice_str(round_num) + self.get_reward_str(round_num) + self.get_money_str()
